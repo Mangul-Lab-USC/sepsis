@@ -13,10 +13,10 @@ GSM670459,blood_day0_patient6,Blood,Homosapiens,M,46,0,34,YES,Sepsis,ARDS,Influe
 GSM670460,blood_day6_patient6,Blood,Homosapiens,M,46,6,34,YES,Sepsis,ARDS,Influenza,Viral,Lung,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,1,1,NA,1,1,NA
 GSM670461,blood_day0_patient7,Blood,Homosapiens,M,25,0,17,YES,Sepsis,ARDS,Influenza,Viral,Lung,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,1,1,NA,1,1,NA
 GSM670462,blood_day6_patient7,Blood,Homosapiens,M,25,6,17,YES,Sepsis,ARDS,Influenza,Viral,Lung,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,1,1,NA,1,1,NA
-GSM670463,Blood_Control1,Blood,Homosapiens,M,41,NA,NA,,Healthy,,,,,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,0,NA,NA,0,NA,0
-GSM670464,Blood_Control2,Blood,Homosapiens,M,48,NA,NA,,Healthy,,,,,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,0,NA,NA,0,NA,0
-GSM670465,Blood_Control3,Blood,Homosapiens,F,38,NA,NA,,Healthy,,,,,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,0,NA,NA,0,NA,0
-GSM670466,Blood_Control4,Blood,Homosapiens,M,26,NA,NA,,Healthy,,,,,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,0,NA,NA,0,NA,0
-GSM670467,Blood_Control5,Blood,Homosapiens,M,41,NA,NA,,Healthy,,,,,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,0,NA,NA,0,NA,0
-GSM670468,Blood_Control6,Blood,Homosapiens,F,40,NA,NA,,Healthy,,,,,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,0,NA,NA,0,NA,0
-GSM670469,Blood_Control7,Blood,Homosapiens,F,35,NA,NA,,Healthy,,,,,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,0,NA,NA,0,NA,0
+GSM670463,Blood_Control1,Blood,Homosapiens,M,41,NA,NA,control,Healthy,,,,,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,0,NA,NA,0,NA,0
+GSM670464,Blood_Control2,Blood,Homosapiens,M,48,NA,NA,control,Healthy,,,,,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,0,NA,NA,0,NA,0
+GSM670465,Blood_Control3,Blood,Homosapiens,F,38,NA,NA,control,Healthy,,,,,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,0,NA,NA,0,NA,0
+GSM670466,Blood_Control4,Blood,Homosapiens,M,26,NA,NA,control,Healthy,,,,,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,0,NA,NA,0,NA,0
+GSM670467,Blood_Control5,Blood,Homosapiens,M,41,NA,NA,control,Healthy,,,,,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,0,NA,NA,0,NA,0
+GSM670468,Blood_Control6,Blood,Homosapiens,F,40,NA,NA,control,Healthy,,,,,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,0,NA,NA,0,NA,0
+GSM670469,Blood_Control7,Blood,Homosapiens,F,35,NA,NA,control,Healthy,,,,,BloodsampleswerecollectedwithPAXgeneBloodRNAtubes,Peripheralbloodcells,GPL6244,0,NA,NA,0,NA,0

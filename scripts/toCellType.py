@@ -1,13 +1,13 @@
 mydict = {}
 
-df = open("../raw_data/E-MTAB-4421/EMTAB4421.51PHENO.csv","r")
+df = open("../raw_data/gse54514gpl6947PHENO.csv","r")
 for line in df:
   fields = line.strip().split(",")
-  sample = fields[0]
-  survivor = fields[4]
+  sample = fields[15]
+  survivor = fields[7]
   mydict[sample] = survivor
 
-with open("../summary_data/E-MTAB-4421/GEDITPredictions4421.tsv","r") as celltype:
+with open("../summary_data/GSE54514/LM22prediction54514.tsv","r") as celltype:
      for line in celltype:
           fields = line.strip().split("\t")
           sample = fields[0]
