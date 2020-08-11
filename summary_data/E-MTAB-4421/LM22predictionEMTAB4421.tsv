@@ -1,4 +1,4 @@
-	B_cells_naive	B_cells_memory	Plasma_cells	T_cells_CD8	T_cells_CD4_naive	T_cells_CD4_memory_resting	T_cells_CD4_memory_activated	T_cells_follicular_helper	T_cells_regulatory_Tregs	T_cells_gamma_delta	NK_cells_resting	NK_cells_activated	Monocytes	Macrophages_M0	Macrophages_M1	Macrophages_M2	Dendritic_cells_resting	Dendritic_cells_activated	Mast_cells_resting	Mast_cells_activated	Eosinophils	Neutrophils
+id	B_cells_naive	B_cells_memory	Plasma_cells	T_cells_CD8	T_cells_CD4_naive	T_cells_CD4_memory_resting	T_cells_CD4_memory_activated	T_cells_follicular_helper	T_cells_regulatory_Tregs	T_cells_gamma_delta	NK_cells_resting	NK_cells_activated	Monocytes	Macrophages_M0	Macrophages_M1	Macrophages_M2	Dendritic_cells_resting	Dendritic_cells_activated	Mast_cells_resting	Mast_cells_activated	Eosinophils	Neutrophils
 6235821066_A	0.00436	0	0	0	0	0	0	0	0	0.16507	0.01316	0	0.40028	0.15863	0.01847	0	0	0	0	0.0109	0	0.22913
 6235821066_C	0.00227	0	0.01409	0	0.06418	0	0	0	0	0.04332	0.03426	0	0.23251	0.15337	0.02494	0	0	0	0	0.02175	0	0.40931
 6235821066_D	0	0	0	0	0	0	0	0	0	0.16044	0.00878	0	0.34586	0.16244	0.0229	0	0	0	0	0.02395	0	0.27563
