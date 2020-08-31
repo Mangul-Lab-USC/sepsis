@@ -4,10 +4,10 @@ df = open("../raw_data/gse63042gpl9115PHENO.csv","r", encoding="utf8", errors='i
 for line in df:
   fields = line.strip().split(",")
   sample = fields[0]
-  survivor = fields[28]
+  survivor = fields[2]
   mydict[sample] = survivor
 
-with open("../summary_data/symb.tsv","r") as gene:
+with open("../summary_data/geneName.tsv","r") as gene:
      for line in gene:
           fields = line.strip().split("\t")
           sample = fields[0]

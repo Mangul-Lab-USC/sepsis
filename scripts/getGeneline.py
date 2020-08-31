@@ -26,20 +26,20 @@ def getGeneLine(fileList, geneName):
   return outDict
 
 expressionFileList = [\
-        '../summary_data/E-MEXP-3567/GeneSymbEMEXP3567.tsv',\
-        '../summary_data/E-MTAB-4421/GeneSymb4421.tsv',\
-        '../summary_data/GSE10474/GeneSymb10474.tsv',\
-        '../summary_data/GSE21802/GeneSymb21802.tsv',\
-        '../summary_data/GSE27131/GeneSymb27131.tsv',\
-        '../summary_data/GSE32707/GeneSymb32707.tsv',\
-        '../summary_data/GSE33341/GeneSymb33341.tsv',\
-        '../summary_data/GSE40586/GeneSymb40586.tsv',\
-        '../summary_data/GSE54514/GeneSymb54514.tsv',\
-        '../summary_data/GSE63042/GeneSymb63042.tsv',\
-        '../summary_data/GSE63990/GeneSymb63990.tsv',\
-        '../summary_data/GSE66890/GeneSymb66890.tsv']
+        '../summary_data/expression_data/GeneSymbEMEXP3567.tsv',\
+        '../summary_data/expression_data/GeneSymb4421.tsv',\
+        '../summary_data/expression_data/GeneSymb10474.tsv',\
+        '../summary_data/expression_data/GeneSymb21802.tsv',\
+        '../summary_data/expression_data/GeneSymb27131.tsv',\
+        '../summary_data/expression_data/GeneSymb32707.tsv',\
+        '../summary_data/expression_data/GeneSymb33341.tsv',\
+        '../summary_data/expression_data/GeneSymb40586.tsv',\
+        '../summary_data/expression_data/GeneSymb54514.tsv',\
+        '../summary_data/expression_data/GeneSymb63042.tsv',\
+        '../summary_data/expression_data/GeneSymb63990.tsv',\
+        '../summary_data/expression_data/GeneSymb66890.tsv']
 
-outDict = getGeneLine(expressionFileList, "UBA7")
+outDict = getGeneLine(expressionFileList, "IL1R2")
 
 for file in outDict:
      print(outDict[file][0].strip())
