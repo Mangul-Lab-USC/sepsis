@@ -39,7 +39,7 @@ expressionFileList = [\
         '../summary_data/expression_data/GeneSymb63990.tsv',\
         '../summary_data/expression_data/GeneSymb66890.tsv']
 
-outDict = getGeneLine(expressionFileList, "IL1R2")
+outDict = getGeneLine(expressionFileList, "CEACAM8")
 
 for file in outDict:
      print(outDict[file][0].strip())
