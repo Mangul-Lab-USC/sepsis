@@ -30,6 +30,10 @@ gene=gene%>%
   mutate(APACHE.scores=ifelse(score_type %in% c("APACHE","APACHE_II"),severity_score,NA))
 summary(gene$APACHE.scores)
 
+# add an age group column
+celltypes$AgeGroup <- cut(celltypes$age, breaks = c(0, 18, 65, Inf), 
+                          labels = c('Children', 'Adults', 'Elderly'))
+
 # data distribution
 install.packages("ggpubr")
 library(ggplot2)
@@ -68,8 +72,9 @@ for (i in 8){
 table(celltypes$survivor)
 
 trainingData <- celltypes[celltypes$use == 'discovery',]
+trainingAdult <- celltypes[celltypes$AgeGroup == 'Adults',]
+trainingElder <- celltypes[celltypes$AgeGroup == 'Elderly',]
 
-trainingData.gene <- gene[gene$use == 'discovery',]
 
 # logistic regression model for clinical score
 model.apache <- glm(survivor~APACHE.scores,trainingData,family = 'binomial')
@@ -121,22 +126,10 @@ legend("bottomright",
        lty = 1, lwd = 2, cex = .9)
 dev.off()
 
-# overall prediction for scores
-apache.test <- celltypes[celltypes$APACHE.scores,]
-apache.pred <- predict(model.apache, apache.test,type = 'response')
-
-misClassError(apache.test$survivor,apache.pred)
-
-apache.roc <- roc(celltypes$survivor~apache.pred,plot=TRUE,print.auc=TRUE)
 
 
 
 
-########################### 救命
-library(InformationValue)
-optCutOff <- optimalCutoff(apache.test$survivor, apache.pred,
-                           optimiseFor = 'misclasserror')[1] 
-################################
 
 # pull out columns that are statistically significant with survivor
 
@@ -224,6 +217,39 @@ ggsave("significant_cells.png", plot = figure1, path = "../figures/", dpi = 300)
 # associated with mortality
 model_glm <- glm(survivor~Mast_cells_resting+Macrophages+T_cells_CD4, 
                  data = trainingData, family = 'binomial')
+
+# overall prediction
+par(mfcol = c(3,2))
+# standard predictors
+test <- gene[gene$score_type %in% c("APACHE","APACHE_II"),]
+
+pred <- predict(model.apache, newdata = test, type = "response")
+roc <- roc(test$survivor~pred,plot=TRUE,print.auc =TRUE,
+           main="ROC Curves: Clinical Severity Scores")
+# severity+celltypes
+pred <- predict(model_glm, newdata = test, type = "response")
+roc <- roc(test$survivor~pred,plot=TRUE,print.auc=TRUE,
+           main="ROC Curves: Clinical Scores and Cell Types Composition")
+# Adult
+test <- celltypes[celltypes$AgeGroup == "Adults",]
+pred <- predict(model_glm,newdata = test,type = "response")
+roc <- roc(test$survivor~pred,plot=TRUE,print.auc=TRUE,
+           main="ROC Curves for Adults")
+# Elderly
+test <- celltypes[celltypes$AgeGroup == "Elderly",]
+pred <- predict(model_glm,newdata = test,type = "response")
+roc <- roc(test$survivor~pred,plot=TRUE,print.auc=TRUE,
+           main="ROC Curves for Elderly")
+# Children
+test <- celltypes[celltypes$AgeGroup == "Children",]
+pred <- predict(model_glm,newdata = test,type = "response")
+roc <- roc(test$survivor~pred,plot=TRUE,print.auc=TRUE,
+           main="ROC Curves for Children")
+# All
+pred <- predict(model_glm,newdata = test,type = "response")
+roc <- roc(gene$survivor~pred,plot=TRUE,print.auc=TRUE,
+           main="ROC Curves for All Ages")
+
 summary(model_glm)
 # This will make predictions on the training data that you use to fit the model 
 # and give me a vector of fitted probabilities.
@@ -250,9 +276,184 @@ specificity(trainingData$survivor, glm.prob)
 # The lower the misclassification error, the better is your model.
 misClassError(trainingData$survivor,glm.prob)
 
-# add an age group column
-celltypes$AgeGroup <- cut(celltypes$age, breaks = c(0, 18, 65, Inf), 
-                          labels = c('Children', 'Adults', 'Elderly'))
+# plot roc curves for training and test data
+png('../figures/roc_train.test.png', height = 2300, width = 3300, res = 300)
+
+par(mfrow = c(2,3))
+# training
+# cell types
+list <- list()
+train <- c("E-MEXP-3567","GSE10474","GSE27131","GSE32707","GSE40586","GSE63042",
+           "GSE66890")
+legend_list<-c()
+col_plot<-c()
+for (i in 1:length(train)){
+  test<-celltypes[celltypes$accession == train[i],]
+  pred<-predict(model_glm, newdata = test, type = "response")
+  k=match(train[i],full_name)
+  col_plot<-c(col_plot,col[k])
+  if (i==1)
+  {
+    roc=roc(test$survivor ~ pred, plot = TRUE,
+            main = 'Cell types',lwd = 1, col = col[k])
+  }
+  else
+  {
+    roc=roc(test$survivor ~ pred, plot = TRUE,col = col[k], add = TRUE,
+            lwd = 1)
+  }
+  legend_list<-paste(c(legend_list,paste(train[i],sprintf("AUC = %0.3f", roc$auc))))
+  
+}
+legend("bottomright", 
+       legend_list, 
+       col = col_plot,
+       lty = 1, lwd = 2, cex = .8)
+
+# severity alone
+model.apache <- glm(survivor~APACHE.scores,trainingData,family = 'binomial')
+list<-list()
+train<-c('GSE10474','GSE32707','GSE66890')
+legend_list<-c()
+col_plot<-c()
+for (i in 1:length(train)){
+  test<-celltypes[celltypes$accession == train[i],]
+  pred<-predict(model.apache, newdata = test, type = "response")
+  k=match(train[i],full_name)
+  col_plot<-c(col_plot,col[k])
+  if (i==1)
+  {
+    roc=roc(test$survivor ~ pred, plot = TRUE,
+            main = 'Clinical scores alone',lwd = 1, col = col[k])
+  }
+  else
+  {
+    roc=roc(test$survivor ~ pred, plot = TRUE,col = col[k], add = TRUE,
+            lwd = 1)
+  }
+  legend_list<-paste(c(legend_list,paste(train[i],sprintf("AUC = %0.3f", roc$auc))))
+  
+}
+legend("bottomright", 
+       legend_list, 
+       col = col_plot,
+       lty = 1, lwd = 2, cex = .8)
+
+# severity+cell types
+model_joint <- glm(survivor~Mast_cells_resting+Macrophages+T_cells_CD4+APACHE.scores, 
+                 data = trainingData, family = 'binomial')
+summary(model_joint)
+list<-list()
+legend_list<-c()
+col_plot<-c()
+for (i in 1:length(train)){
+  test<-celltypes[celltypes$accession == train[i],]
+  pred<-predict(model_joint, newdata = test, type = "response")
+  k=match(train[i],full_name)
+  col_plot<-c(col_plot,col[k])
+  if (i==1)
+  {
+    roc=roc(test$survivor ~ pred, plot = TRUE,
+            main = 'Cell types + clinical scores',lwd = 1, col = col[k])
+  }
+  else
+  {
+    roc=roc(test$survivor ~ pred, plot = TRUE,col = col[k], add = TRUE,
+            lwd = 1)
+  }
+  legend_list<-paste(c(legend_list,paste(train[i],sprintf("AUC = %0.3f", roc$auc))))
+  
+}
+legend("bottomright", 
+       legend_list, 
+       col = col_plot,
+       lty = 1, lwd = 2, cex = .8)
+
+# test
+# cell types
+list <- list()
+testing <- c("E-MTAB-4421","GSE21802","GSE33341","GSE54514","GSE63990")
+legend_list<-c()
+col_plot<-c()
+for (i in 1:length(testing)){
+  test<-celltypes[celltypes$accession == testing[i],]
+  pred<-predict(model_glm, newdata = test, type = "response")
+  k=match(testing[i],full_name)
+  col_plot<-c(col_plot,col[k])
+  if (i==1)
+  {
+    roc=roc(test$survivor ~ pred, plot = TRUE,
+            main = 'Cell types',lwd = 1, col = col[k])
+  }
+  else
+  {
+    roc=roc(test$survivor ~ pred, plot = TRUE,col = col[k], add = TRUE,
+            lwd = 1)
+  }
+  legend_list<-paste(c(legend_list,paste(testing[i],sprintf("AUC = %0.3f", roc$auc))))
+  
+}
+legend("bottomright", 
+       legend_list, 
+       col = col_plot,
+       lty = 1, lwd = 2, cex = .8)
+
+# severity alone
+list <- list()
+testing <- c("E-MTAB-4421", "GSE54514")
+legend_list<-c()
+col_plot<-c()
+for (i in 1:length(testing)){
+  test<-celltypes[celltypes$accession == testing[i],]
+  pred<-predict(model.apache, newdata = test, type = "response")
+  k=match(testing[i],full_name)
+  col_plot<-c(col_plot,col[k])
+  if (i==1)
+  {
+    roc=roc(test$survivor ~ pred, plot = TRUE,
+            main = 'Clinical scores alone',lwd = 1, col = col[k])
+  }
+  else
+  {
+    roc=roc(test$survivor ~ pred, plot = TRUE,col = col[k], add = TRUE,
+            lwd = 1)
+  }
+  legend_list<-paste(c(legend_list,paste(testing[i],sprintf("AUC = %0.3f", roc$auc))))
+  
+}
+legend("bottomright", 
+       legend_list, 
+       col = col_plot,
+       lty = 1, lwd = 2, cex = .8)
+
+# severity+cell types
+list <- list()
+testing <- c("E-MTAB-4421", "GSE54514")
+legend_list<-c()
+col_plot<-c()
+for (i in 1:length(testing)){
+  test<-celltypes[celltypes$accession == testing[i],]
+  pred<-predict(model_joint, newdata = test, type = "response")
+  k=match(testing[i],full_name)
+  col_plot<-c(col_plot,col[k])
+  if (i==1)
+  {
+    roc=roc(test$survivor ~ pred, plot = TRUE,
+            main = 'Cell types + clinical scores',lwd = 1, col = col[k])
+  }
+  else
+  {
+    roc=roc(test$survivor ~ pred, plot = TRUE,col = col[k], add = TRUE,
+            lwd = 1)
+  }
+  legend_list<-paste(c(legend_list,paste(testing[i],sprintf("AUC = %0.3f", roc$auc))))
+  
+}
+legend("bottomright", 
+       legend_list, 
+       col = col_plot,
+       lty = 1, lwd = 2, cex = .8)
+dev.off()
 
 # open a png file
 png('../figures/roc_AgeGroups.png', height = 2300, width = 2300, res = 300)
@@ -454,46 +655,58 @@ legend("bottomright",
 dev.off()
 
 #####################################################
+gene$Mast_cells_resting <- celltypes$Mast_cells_resting
+gene$Macrophages <- celltypes$Macrophages
+gene$T_cells_CD4 <- celltypes$T_cells_CD4
+# add an age group column
+gene$AgeGroup <- cut(gene$age, breaks = c(0, 18, 65, Inf), 
+                     labels = c('Children', 'Adults', 'Elderly'))
 
 # logistic regression model on gene expression that are statistically significant 
 # associated with mortality
-model_glm <- glm(survivor~Mast_cells_resting+Macrophages+T_cells_CD4+age, 
-                 data = trainingData, family = 'binomial')
+trainingData.gene <- gene[gene$use == 'discovery',]
+model.apache <- glm(survivor~APACHE.scores, data=trainingData.gene,family="binomial")
+model_glm <- glm(survivor~CFD+DDIT4+DEFA4+IFI27+IL1R2+MAFF+AIM2+APH1A+CCR2+EIF5A+RAB40B+VNN3+Mast_cells_resting+Macrophages+T_cells_CD4+APACHE.scores, 
+                 data = trainingData.gene, family = 'binomial')
 summary(model_glm)
-# This will make predictions on the training data that you use to fit the model 
-# and give me a vector of fitted probabilities.
-glm.prob <- predict(model_glm,trainingData,type = 'response')
-glm.prob[1:5]
 
-# turn the probabilities into classifications by thresholding at 0.5
-glm.pred <- ifelse(glm.prob > 0.5, 1, 0)
-attach(trainingData)
+# standard predictors
+test <- gene[gene$score_type %in% c("APACHE","APACHE_II"),]
 
-table(glm.pred,trainingData$survivor)
-mean(glm.pred == trainingData$survivor)
-
-# Concordance
-# higher the concordance, the better is the quality of model
-Concordance(trainingData$survivor, glm.prob)
-
-# sensitivity and specificity
-sensitivity(trainingData$survivor, glm.prob)
-specificity(trainingData$survivor, glm.prob)
-
-# Misclassification Error
-# percentage mismatch of predcited vs actuals, irrespective of 1’s or 0’s. 
-# The lower the misclassification error, the better is your model.
-misClassError(trainingData$survivor,glm.prob)
-
-# add an age group column
-celltypes$AgeGroup <- cut(celltypes$age, breaks = c(0, 18, 65, Inf), 
-                          labels = c('Children', 'Adults', 'Elderly'))
+pred <- predict(model.apache, newdata = test, type = "response")
+roc <- roc(test$survivor~pred,plot=TRUE,print.auc =TRUE,
+           main="ROC Curves: Clinical Severity Scores")
+# severity+celltypes+gene
+pred <- predict(model_glm, newdata = test, type = "response")
+roc <- roc(test$survivor~pred,plot=TRUE,print.auc=TRUE,
+           main="ROC Curves: Clinical Scores + Cell Types + Gene")
+# Adult
+test <- gene[gene$AgeGroup == "Adults",]
+pred <- predict(model_glm,newdata = test,type = "response")
+roc <- roc(test$survivor~pred,plot=TRUE,print.auc=TRUE,
+           main="ROC Curves for Adults")
+# Elderly
+test <- gene[gene$AgeGroup == "Elderly",]
+pred <- predict(model_glm,newdata = test,type = "response")
+roc <- roc(test$survivor~pred,plot=TRUE,print.auc=TRUE,
+           main="ROC Curves for Elderly")
+# Children
+test <- gene[gene$AgeGroup == "Children",]
+pred <- predict(model_glm,newdata = test,type = "response")
+roc <- roc(test$survivor~pred,plot=TRUE,print.auc=TRUE,
+           main="ROC Curves for Children")
+# All
+pred <- predict(model_glm,newdata = gene,type = "response")
+roc <- roc(gene$survivor~pred,plot=TRUE,print.auc=TRUE,
+           main="ROC Curves for All Ages")
 
 # open a png file
 png('../figures/roc_AgeGroups.png', height = 2300, width = 2300, res = 300)
 # set ncols and nrows
 par(mfcol = c(2,2))
-
+full_name<-c('EMEXP3567','E-MTAB-4421','GSE10474','GSE21802','GSE27131',
+             'GSE32707','GSE33341','GSE40586','GSE54514','GSE63042',
+             'GSE63990','GSE66890')
 ### plot roc curves for adults
 list<-list()
 
@@ -503,7 +716,7 @@ name<-c('E-MTAB-4421','GSE10474','GSE27131','GSE32707','GSE33341','GSE40586',
 legend_list<-c()
 col_plot<-c()
 for (i in 1:length(name)){
-  test<-celltypes[celltypes$accession == name[i]&celltypes$AgeGroup == 'Adults',]
+  test<-gene[gene$accession == name[i]&gene$AgeGroup == 'Adults',]
   pred<-predict(model_glm, newdata = test, type = "response")
   k=match(name[i],full_name)
   col_plot<-c(col_plot,col[k])
@@ -533,7 +746,7 @@ name<-c('E-MTAB-4421','GSE10474','GSE32707','GSE33341','GSE54514','GSE66890')
 legend_list<-c()
 col_plot<-c()
 for (i in 1:length(name)){
-  test<-celltypes[celltypes$accession == name[i]&celltypes$AgeGroup == 'Elderly',]
+  test<-gene[gene$accession == name[i]&gene$AgeGroup == 'Elderly',]
   pred<-predict(model_glm, newdata = test, type = "response")
   k=match(name[i],full_name)
   col_plot<-c(col_plot,col[k])
@@ -558,12 +771,12 @@ legend("bottomright",
 ### plot roc curves for children
 list<-list()
 
-name<-c('E-MEXP-3567')
+name<-c('EMEXP3567')
 
 legend_list<-c()
 col_plot<-c()
 for (i in 1:length(name)){
-  test<-celltypes[celltypes$accession == name[i]&celltypes$AgeGroup == 'Children',]
+  test<-gene[gene$accession == name[i]&gene$AgeGroup == 'Children',]
   pred<-predict(model_glm, newdata = test, type = "response")
   k=match(name[i],full_name)
   col_plot<-c(col_plot,col[k])
@@ -593,7 +806,7 @@ name<-full_name
 legend_list<-c()
 col_plot<-c()
 for (i in 1:length(name)){
-  test<-celltypes[celltypes$accession == name[i],]
+  test<-gene[gene$accession == name[i],]
   pred<-predict(model_glm, newdata = test, type = "response")
   k=match(name[i],full_name)
   col_plot<-c(col_plot,col[k])
